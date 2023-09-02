@@ -1,11 +1,13 @@
 package hello.jdbc.exception.basic;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@Slf4j
 public class UncheckedAppTest {
 
     @Test
@@ -14,6 +16,17 @@ public class UncheckedAppTest {
 
         assertThatThrownBy(() -> controller.request())
                 .isInstanceOf(Exception.class);
+    }
+
+    @Test
+    void printEx() {
+        Controller controller = new Controller();
+
+        try {
+            controller.request();
+        } catch (Exception e) {
+            log.info("ex", e);
+        }
     }
 
     static class Controller {
@@ -46,6 +59,8 @@ public class UncheckedAppTest {
                 runSQL();
             } catch (SQLException e) {
                 // 체크 예외를 언체크 예외로 변환해서 넘김
+                // 예외 변환 시, 기존 예외를 꼭! 포함해야한다.
+                // 포함하지 않으면 대체 어디서 생긴 문제인지 알 방법이 없다.
                 throw new RuntimeSQLException(e);
             }
         }
