@@ -9,29 +9,38 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * @Transactional 은 원래 로직이 성공하면 커밋되도록 동작한다.
+ * 하지만 테스트에서 사용하면 특별하게 동작한다.
+ * 테스트에서 사용하면, 트랜잭션을 시작하고 끝날 떄 롤백한다.
+ * (클래스 레벨, 메서드 레벨에서 사용 가능)
+ */
+@Transactional
 @SpringBootTest
 class ItemRepositoryTest {
 
     @Autowired
     ItemRepository itemRepository;
 
-    @Autowired
-    PlatformTransactionManager transactionManager;
-    TransactionStatus status;
-
-    @BeforeEach
-    void beforeEach() {
-        // 트랜잭션 시작
-        status = transactionManager.getTransaction(new DefaultTransactionDefinition());
-    }
+//    @Autowired
+//    PlatformTransactionManager transactionManager;
+//    TransactionStatus status;
+//
+//    @BeforeEach
+//    void beforeEach() {
+//        // 트랜잭션 시작
+//        status = transactionManager.getTransaction(new DefaultTransactionDefinition());
+//    }
 
     @AfterEach
     void afterEach() {
@@ -41,9 +50,10 @@ class ItemRepositoryTest {
         }
 
         // 트랜잭션 롤백
-        transactionManager.rollback(status);
+//        transactionManager.rollback(status);
     }
 
+//    @Commit // 만약 꼭 커밋을 해야하는 상황이라면 해당 애노테이션을 사용하면 된다. ( == @Rollback(false) )
     @Test
     void save() {
         //given
